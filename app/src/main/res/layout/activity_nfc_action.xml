@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:context=".NfcAction">
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Escrivà Parking"
+        android:textAlignment="center"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/entrada_button"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:layout_marginBottom="10sp"
+        android:backgroundTint="#3C883F"
+        android:text="Entrada"
+        android:textSize="34sp" />
+
+    <Button
+        android:id="@+id/salida_button"
+        android:layout_width="match_parent"
+        android:layout_height="348dp"
+        android:text="Salida"
+        android:textSize="34sp" />
+
+    <include
+        android:id="@+id/include"
+        layout="@layout/content_nfc_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
