@@ -1,7 +1,8 @@
 package es.escriva
 
+import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -31,6 +32,14 @@ class NfcAction : AppCompatActivity() {
 //                .setAction("Action", null)
 //                .setAnchorView(R.id.fab).show()
 //        }
+
+        // Obtén el botón de la vista
+        val entradaButton = findViewById<Button>(R.id.entrada_button)
+
+        // Agrega un OnClickListener al botón
+        entradaButton.setOnClickListener {
+
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
