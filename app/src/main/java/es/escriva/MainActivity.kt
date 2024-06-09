@@ -10,6 +10,7 @@ import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.os.Bundle
+import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -18,6 +19,7 @@ import es.escriva.activity.TokenActivity
 import es.escriva.activity.VehicleRecordActivity
 import es.escriva.database.AppDatabase
 import es.escriva.domain.Token
+import es.escriva.repository.DayAndVehiclesRepository
 import es.escriva.repository.TokenRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -53,6 +55,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var tokenRepository: TokenRepository
 
+    private lateinit var dayAndVehiclesRepository: DayAndVehiclesRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -67,6 +71,11 @@ class MainActivity : AppCompatActivity() {
 
         AppDatabase.getDatabase(this).also {
             tokenRepository = TokenRepository(it.tokenDao())
+        }
+
+        val showRecordsButton: Button = findViewById(R.id.btn_show_records)
+        showRecordsButton.setOnClickListener {
+            showVehicleRecordsForActiveDay()
         }
     }
 
@@ -128,9 +137,10 @@ class MainActivity : AppCompatActivity() {
         return payload.toLong()
     }
 
-    fun showVehicleRecordsForDay(day: LocalDateTime) {
+    fun showVehicleRecordsForActiveDay() {
+        val activeDay = dayAndVehiclesRepository.getActiveDay()
         val intent = Intent(this, VehicleRecordActivity::class.java).apply {
-            putExtra("day", day)
+            putExtra("day", activeDay)
         }
         startActivity(intent)
     }

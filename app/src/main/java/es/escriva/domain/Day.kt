@@ -1,7 +1,9 @@
 package es.escriva.domain
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.io.Serializable
 import java.time.LocalDate
 
 @Entity
@@ -18,4 +20,4 @@ data class Day (
 
     var active: Boolean = true
 
-)
+) : Serializable

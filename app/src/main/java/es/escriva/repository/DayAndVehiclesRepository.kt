@@ -1,6 +1,7 @@
 package es.escriva.repository
 
 import VehicleRecordDao
+import androidx.room.Query
 import androidx.room.Transaction
 import es.escriva.dao.DayDao
 import es.escriva.domain.Day
@@ -33,6 +34,14 @@ class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRe
         vehicleRecord.active = false
         vehicleRecord.amount = calculateAmount(vehicleRecord.enterTime, exitTime)
         vehicleRecordDao.update(vehicleRecord)
+    }
+
+    fun getVehicleRecordsForDay(dayId: Long): List<VehicleRecord> {
+        return vehicleRecordDao.findByDay(dayId)
+    }
+
+    fun getActiveDay(): Day? {
+        return dayDao.findFirstActiveDay()
     }
 
     private fun calculateAmount(start: LocalDateTime, end: LocalDateTime): Double {

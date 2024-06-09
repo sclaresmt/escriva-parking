@@ -17,4 +17,7 @@ interface VehicleRecordDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(vehicleRecord: VehicleRecord): Long
 
+    @Query("SELECT * FROM VehicleRecord WHERE dayId = :dayId")
+    fun findByDay(dayId: Long): List<VehicleRecord>
+
 }
