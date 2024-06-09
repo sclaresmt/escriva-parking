@@ -1,6 +1,7 @@
 package es.escriva
 
 import android.app.PendingIntent
+import android.app.ProgressDialog
 import android.content.Intent
 import android.content.IntentFilter
 import android.nfc.NdefMessage
@@ -15,6 +16,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import es.escriva.domain.Token
 import es.escriva.repository.TokenRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 class MainActivity : AppCompatActivity() {
@@ -31,6 +36,15 @@ class MainActivity : AppCompatActivity() {
         this, 0, Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
         PendingIntent.FLAG_MUTABLE // Requerido en Android 12 y superior
     )
+
+    private val nfcJob = Job()
+
+    private val nfcScope = CoroutineScope(Dispatchers.Main + nfcJob)
+
+    private val progressDialog = ProgressDialog(this).apply {
+        setMessage("Leyendo NFC...")
+        setCancelable(false)
+    }
 
     private lateinit var nfcAdapter: NfcAdapter
 
@@ -63,28 +77,52 @@ class MainActivity : AppCompatActivity() {
         nfcAdapter?.disableForegroundDispatch(this)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        nfcJob.cancel()
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
             val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
             val ndef = Ndef.get(tag)
-            val ndefMessage = ndef.cachedNdefMessage
-            val record = ndefMessage.records[0]
-            val payload = String(record.payload)
+            val activityContext = this
+            progressDialog.show()
 
-            if (payload.isEmpty()) {
-                val token = Token(dateTimeCreation = LocalDateTime.now())
-                val tokenId = tokenRepository.insert(token) // Necesitas una referencia a tu TokenDao para hacer esto
+            // Lanzar una nueva coroutine en el hilo de fondo
+            nfcScope.launch(Dispatchers.IO) {
+                val ndefMessage = ndef.cachedNdefMessage
+                val record = ndefMessage.records[0]
+                val payload = String(record.payload)
+                val tokenId= obtainTokenIdAndMakeTokenReadOnly(payload, ndef)
 
-                val newRecord = NdefRecord.createMime("text/plain", tokenId.toString().toByteArray())
-                val newMessage = NdefMessage(arrayOf(newRecord))
-                ndef.writeNdefMessage(newMessage)
-
-                ndef.makeReadOnly()
+                val token = tokenRepository.findById(tokenId)
+                val nfcIntent = Intent(activityContext, TokenAction::class.java)
+                    .putExtra("token", token)
+                progressDialog.dismiss()
+                startActivity(nfcIntent)
             }
-
-            startActivity(Intent(this, NfcAction::class.java))
         }
+    }
+
+    private fun obtainTokenIdAndMakeTokenReadOnly(
+        payload: String,
+        ndef: Ndef
+    ): Long {
+        if (payload.isEmpty()) {
+            val newToken = Token(dateTimeCreation = LocalDateTime.now())
+            val tokenId = tokenRepository.insert(newToken)
+
+            val newRecord =
+                NdefRecord.createMime("text/plain", tokenId.toString().toByteArray())
+            val newMessage = NdefMessage(arrayOf(newRecord))
+            ndef.writeNdefMessage(newMessage)
+
+            ndef.makeReadOnly()
+            return tokenId
+        }
+        return payload.toLong()
     }
 
 }

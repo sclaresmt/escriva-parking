@@ -1,36 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:context=".NfcAction">
+    tools:context=".TokenAction">
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Escrivà Parking"
+        android:text="@string/main_title"
         android:textAlignment="center"
         android:textSize="24sp" />
 
     <Button
-        android:id="@+id/entrada_button"
+        android:id="@+id/enter_button"
         android:layout_width="match_parent"
         android:layout_height="350dp"
         android:layout_marginBottom="10sp"
         android:backgroundTint="#3C883F"
-        android:text="Entrada"
+        android:text="@string/enter"
         android:textSize="34sp" />
 
     <Button
-        android:id="@+id/salida_button"
+        android:id="@+id/exit_button"
         android:layout_width="match_parent"
         android:layout_height="348dp"
-        android:text="Salida"
+        android:text="@string/exit"
         android:textSize="34sp" />
 
     <include

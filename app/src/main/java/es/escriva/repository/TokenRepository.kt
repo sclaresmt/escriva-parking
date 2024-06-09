@@ -8,4 +8,9 @@ class TokenRepository(private val tokenDao: TokenDao) {
     fun insert(token: Token): Long {
         return tokenDao.insert(token)
     }
+
+    fun findById(tokenId: Long): Token {
+        return tokenDao.findById(tokenId)
+    }
+
 }
