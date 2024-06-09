@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:context=".TokenAction">
+    tools:context=".activity.TokenActivity">
 
     <TextView
         android:id="@+id/textView2"

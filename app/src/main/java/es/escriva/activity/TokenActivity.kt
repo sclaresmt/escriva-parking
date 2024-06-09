@@ -1,4 +1,4 @@
-package es.escriva
+package es.escriva.activity
 
 import android.os.Bundle
 import android.widget.Button
@@ -8,25 +8,19 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import es.escriva.R
 import es.escriva.databinding.ActivityTokenActionBinding
-import es.escriva.domain.Day
 import es.escriva.domain.Token
-import es.escriva.domain.VehicleRecord
 import es.escriva.repository.DayAndVehiclesRepository
-import es.escriva.repository.VehicleRecordRepository
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.LocalTime
 
-class TokenAction : AppCompatActivity() {
+class TokenActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     private lateinit var binding: ActivityTokenActionBinding
 
     private lateinit var dayAndVehiclesRepository: DayAndVehiclesRepository
-
-    private lateinit var vehicleRecordRepository: VehicleRecordRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

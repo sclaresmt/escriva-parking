@@ -14,6 +14,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import es.escriva.activity.TokenActivity
+import es.escriva.activity.VehicleRecordActivity
+import es.escriva.database.AppDatabase
 import es.escriva.domain.Token
 import es.escriva.repository.TokenRepository
 import kotlinx.coroutines.CoroutineScope
@@ -98,7 +101,7 @@ class MainActivity : AppCompatActivity() {
                 val tokenId= obtainTokenIdAndMakeTokenReadOnly(payload, ndef)
 
                 val token = tokenRepository.findById(tokenId)
-                val nfcIntent = Intent(activityContext, TokenAction::class.java)
+                val nfcIntent = Intent(activityContext, TokenActivity::class.java)
                     .putExtra("token", token)
                 progressDialog.dismiss()
                 startActivity(nfcIntent)
@@ -123,6 +126,13 @@ class MainActivity : AppCompatActivity() {
             return tokenId
         }
         return payload.toLong()
+    }
+
+    fun showVehicleRecordsForDay(day: LocalDateTime) {
+        val intent = Intent(this, VehicleRecordActivity::class.java).apply {
+            putExtra("day", day)
+        }
+        startActivity(intent)
     }
 
 }
