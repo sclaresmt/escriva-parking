@@ -37,19 +37,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val nfcPendingIntent = PendingIntent.getActivity(
-        this, 0, Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
-        PendingIntent.FLAG_MUTABLE // Requerido en Android 12 y superior
-    )
+    private var nfcPendingIntent: PendingIntent? = null
 
     private val nfcJob = Job()
 
     private val nfcScope = CoroutineScope(Dispatchers.Main + nfcJob)
 
-    private val progressDialog = ProgressDialog(this).apply {
-        setMessage("Leyendo NFC...")
-        setCancelable(false)
-    }
+    private var progressDialog: ProgressDialog? = null
 
     private lateinit var nfcAdapter: NfcAdapter
 
@@ -67,10 +61,21 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        nfcPendingIntent = PendingIntent.getActivity(
+            this, 0, Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+            PendingIntent.FLAG_MUTABLE // Requerido en Android 12 y superior
+        )
+
+        progressDialog = ProgressDialog(this).apply {
+            setMessage("Leyendo NFC...")
+            setCancelable(false)
+        }
+
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
 
         AppDatabase.getDatabase(this).also {
             tokenRepository = TokenRepository(it.tokenDao())
+            dayAndVehiclesRepository = DayAndVehiclesRepository(it.dayDao(), it.vehicleRecord())
         }
 
         val showRecordsButton: Button = findViewById(R.id.btn_show_records)
@@ -100,7 +105,7 @@ class MainActivity : AppCompatActivity() {
             val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
             val ndef = Ndef.get(tag)
             val activityContext = this
-            progressDialog.show()
+            progressDialog?.show()
 
             // Lanzar una nueva coroutine en el hilo de fondo
             nfcScope.launch(Dispatchers.IO) {
@@ -112,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                 val token = tokenRepository.findById(tokenId)
                 val nfcIntent = Intent(activityContext, TokenActivity::class.java)
                     .putExtra("token", token)
-                progressDialog.dismiss()
+                progressDialog?.dismiss()
                 startActivity(nfcIntent)
             }
         }

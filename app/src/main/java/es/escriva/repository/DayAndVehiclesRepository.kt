@@ -46,7 +46,7 @@ class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRe
 
     private fun calculateAmount(start: LocalDateTime, end: LocalDateTime): Double {
         val parkingMinutes = ChronoUnit.MINUTES.between(start, end)
-        return parkingMinutes * 0.03
+        return parkingMinutes * 0.03 + 1
     }
 
 }
