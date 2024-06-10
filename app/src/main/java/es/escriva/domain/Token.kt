@@ -9,8 +9,8 @@ import java.time.LocalDateTime
 data class Token (
 
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    val id: Long = 0L,
 
-    val dateTimeCreation: LocalDateTime
+    val lastUpdatedDateTime: LocalDateTime
 
 ) : Serializable

@@ -5,8 +5,8 @@ import es.escriva.domain.Token
 
 class TokenRepository(private val tokenDao: TokenDao) {
 
-    fun insert(token: Token): Long {
-        return tokenDao.insert(token)
+    fun upsert(token: Token): Long {
+        return tokenDao.upsert(token)
     }
 
     fun findById(tokenId: Long): Token {

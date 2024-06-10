@@ -131,8 +131,8 @@ class MainActivity : AppCompatActivity() {
         ndef: Ndef
     ): Long {
         if (payload.isEmpty()) {
-            val newToken = Token(dateTimeCreation = LocalDateTime.now())
-            val tokenId = tokenRepository.insert(newToken)
+            val newToken = Token(lastUpdatedDateTime = LocalDateTime.now())
+            val tokenId = tokenRepository.upsert(newToken)
 
             val newRecord =
                 NdefRecord.createMime("text/plain", tokenId.toString().toByteArray())
