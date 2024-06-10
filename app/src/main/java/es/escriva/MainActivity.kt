@@ -37,6 +37,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val nfcTagDiscoverIntentFilter = IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED)
+
     private var nfcPendingIntent: PendingIntent? = null
 
     private val nfcJob = Job()
@@ -89,40 +91,55 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        nfcAdapter?.enableForegroundDispatch(this, nfcPendingIntent, arrayOf(nfcIntentFilter), null)
+        nfcAdapter?.enableForegroundDispatch(this, nfcPendingIntent, arrayOf(nfcIntentFilter, nfcTagDiscoverIntentFilter), null)
     }
 
     override fun onPause() {
         super.onPause()
         nfcAdapter?.disableForegroundDispatch(this)
+        progressDialog?.dismiss()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         nfcJob.cancel()
+        progressDialog?.dismiss()
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
+        if (NfcAdapter.ACTION_TAG_DISCOVERED == intent.action) {
+            // Formatear el tag con mensaje NDEF vacío
             val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
             val ndef = Ndef.get(tag)
-            val activityContext = this
-            progressDialog?.show()
+            val newMessage = NdefMessage(arrayOf(NdefRecord.createMime("text/plain", "".toByteArray())))
+            ndef.connect()
+            ndef.writeNdefMessage(newMessage)
+            ndef.close()
+            readTokenAndOpenTokenActions(intent)
+        }
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
+            readTokenAndOpenTokenActions(intent)
+        }
+    }
 
-            // Lanzar una nueva coroutine en el hilo de fondo
-            nfcScope.launch(Dispatchers.IO) {
-                val ndefMessage = ndef.cachedNdefMessage
-                val record = ndefMessage.records[0]
-                val payload = String(record.payload)
-                val tokenId= obtainTokenIdAndMakeTokenReadOnly(payload, ndef)
+    private fun readTokenAndOpenTokenActions(intent: Intent) {
+        val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
+        val ndef = Ndef.get(tag)
+        val activityContext = this
+        progressDialog?.show()
 
-                val token = tokenRepository.findById(tokenId)
-                val nfcIntent = Intent(activityContext, TokenActivity::class.java)
-                    .putExtra("token", token)
-                progressDialog?.dismiss()
-                startActivity(nfcIntent)
-            }
+        // Lanzar una nueva coroutine en el hilo de fondo
+        nfcScope.launch(Dispatchers.IO) {
+            val ndefMessage = ndef.cachedNdefMessage
+            val record = ndefMessage.records[0]
+            val payload = String(record.payload)
+            val tokenId = obtainTokenIdAndMakeTokenReadOnly(payload, ndef)
+
+            val token = tokenRepository.findById(tokenId)
+            val nfcIntent = Intent(activityContext, TokenActivity::class.java)
+                .putExtra("token", token)
+            startActivity(nfcIntent)
         }
     }
 
@@ -137,9 +154,10 @@ class MainActivity : AppCompatActivity() {
             val newRecord =
                 NdefRecord.createMime("text/plain", tokenId.toString().toByteArray())
             val newMessage = NdefMessage(arrayOf(newRecord))
+            ndef.connect()
             ndef.writeNdefMessage(newMessage)
-
             ndef.makeReadOnly()
+            ndef.close()
             return tokenId
         }
         return payload.toLong()
