@@ -1,3 +1,5 @@
+package es.escriva.dao
+
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -15,7 +17,7 @@ interface VehicleRecordDao {
     fun insert(vehicleRecord: VehicleRecord): Long
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun update(vehicleRecord: VehicleRecord): Long
+    fun update(vehicleRecord: VehicleRecord): Int
 
     @Query("SELECT * FROM VehicleRecord WHERE dayId = :dayId")
     fun findByDay(dayId: Long): List<VehicleRecord>

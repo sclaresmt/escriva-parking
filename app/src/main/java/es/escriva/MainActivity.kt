@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 
     private val nfcIntentFilter = IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED).apply {
         try {
-            addDataType("*/*") // Para manejar todos los tipos MIME
+            addDataType("text/plain")
         } catch (e: IntentFilter.MalformedMimeTypeException) {
             throw RuntimeException("Error al añadir tipo MIME", e)
         }

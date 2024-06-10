@@ -1,7 +1,6 @@
 package es.escriva.domain
 
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.io.Serializable
 import java.time.LocalDate
@@ -10,7 +9,7 @@ import java.time.LocalDate
 data class Day (
 
     @PrimaryKey(autoGenerate = true)
-    var id: Long = 0,
+    var id: Long = 0L,
 
     var date: LocalDate,
 

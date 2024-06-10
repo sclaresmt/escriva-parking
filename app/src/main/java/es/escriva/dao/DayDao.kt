@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import es.escriva.domain.Day
-import es.escriva.domain.Token
 
 @Dao
 interface DayDao {

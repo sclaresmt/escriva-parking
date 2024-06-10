@@ -1,15 +1,13 @@
 package es.escriva.repository
 
-import VehicleRecordDao
-import androidx.room.Query
 import androidx.room.Transaction
 import es.escriva.dao.DayDao
+import es.escriva.dao.VehicleRecordDao
 import es.escriva.domain.Day
 import es.escriva.domain.Token
 import es.escriva.domain.VehicleRecord
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 
 class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRecordDao: VehicleRecordDao) {

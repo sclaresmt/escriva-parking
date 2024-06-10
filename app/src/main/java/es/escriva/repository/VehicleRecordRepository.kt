@@ -1,6 +1,6 @@
 package es.escriva.repository
 
-import VehicleRecordDao
+import es.escriva.dao.VehicleRecordDao
 import es.escriva.domain.VehicleRecord
 
 class VehicleRecordRepository(private val vehicleRecordDao: VehicleRecordDao) {
