@@ -73,9 +73,12 @@ class MainActivity : AppCompatActivity() {
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
 
-        AppDatabase.getDatabase(this).also {
-            tokenRepository = TokenRepository(it.tokenDao())
-            dayAndVehiclesRepository = DayAndVehiclesRepository(it.dayDao(), it.vehicleRecord())
+        // Initialize the database in a coroutine
+        CoroutineScope(Dispatchers.IO).launch {
+            AppDatabase.getDatabase(this@MainActivity).also {
+                tokenRepository = TokenRepository(it.tokenDao())
+                dayAndVehiclesRepository = DayAndVehiclesRepository(it.dayDao(), it.vehicleRecordDao())
+            }
         }
 
         val showRecordsButton: Button = findViewById(R.id.btn_show_records)

@@ -17,7 +17,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun dayDao(): DayDao
 
-    abstract fun vehicleRecord(): VehicleRecordDao
+    abstract fun vehicleRecordDao(): VehicleRecordDao
 
     companion object {
         @Volatile
@@ -28,7 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "app_database"
+                    "escriva-parking_database"
                 ).build()
                 INSTANCE = instance
                 instance
