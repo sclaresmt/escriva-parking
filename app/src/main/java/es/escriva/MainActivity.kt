@@ -117,8 +117,7 @@ class MainActivity : AppCompatActivity() {
             ndef.writeNdefMessage(newMessage)
             ndef.close()
             readTokenAndOpenTokenActions(intent)
-        }
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
+        } else if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
             readTokenAndOpenTokenActions(intent)
         }
     }

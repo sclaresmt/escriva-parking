@@ -7,7 +7,11 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import es.escriva.database.AppDatabase
 import es.escriva.repository.DayAndVehiclesRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class VehicleRecordActivity : AppCompatActivity() {
 
@@ -24,9 +28,11 @@ class VehicleRecordActivity : AppCompatActivity() {
 
         val day = intent.getSerializableExtra("day") as Day
 
-//        AppDatabase.getDatabase(this).also {
-//            dayAndVehiclesRepository = DayAndVehiclesRepository(it.dayDao(), it.vehicleRecordDao())
-//        }
+        CoroutineScope(Dispatchers.IO).launch {
+            AppDatabase.getDatabase(this@VehicleRecordActivity).also {
+                dayAndVehiclesRepository = DayAndVehiclesRepository(it.dayDao(), it.vehicleRecordDao())
+            }
+        }
 
         val vehicleRecords = dayAndVehiclesRepository.getVehicleRecordsForDay(day.id)
         vehicleRecordRecyclerView.adapter = VehicleRecordAdapter(vehicleRecords)

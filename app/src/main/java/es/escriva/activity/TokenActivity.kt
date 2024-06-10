@@ -9,9 +9,12 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import es.escriva.R
+import es.escriva.database.AppDatabase
 import es.escriva.databinding.ActivityTokenActionBinding
 import es.escriva.domain.Token
 import es.escriva.repository.DayAndVehiclesRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class TokenActivity : AppCompatActivity() {
@@ -28,11 +31,18 @@ class TokenActivity : AppCompatActivity() {
         binding = ActivityTokenActionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Initialize the database in a coroutine
+        CoroutineScope(Dispatchers.IO).launch {
+            AppDatabase.getDatabase(this@TokenActivity).also {
+                dayAndVehiclesRepository = DayAndVehiclesRepository(it.dayDao(), it.vehicleRecordDao())
+            }
+        }
+
 //        setSupportActionBar(binding.toolbar)
 
-        val navController = findNavController(R.id.nav_host_fragment_content_nfc_action)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
+//        val navController = findNavController(R.id.nav_host_fragment_content_nfc_action)
+//        appBarConfiguration = AppBarConfiguration(navController.graph)
+//        setupActionBarWithNavController(navController, appBarConfiguration)
 
 //        binding.fab.setOnClickListener { view ->
 //            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
