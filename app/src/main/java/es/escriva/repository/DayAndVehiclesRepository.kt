@@ -10,6 +10,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
+import kotlin.math.ceil
 
 class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRecordDao: VehicleRecordDao) {
 
@@ -57,7 +58,9 @@ class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRe
 
     private fun calculateAmount(start: LocalTime, end: LocalTime): Double {
         val parkingMinutes = ChronoUnit.MINUTES.between(start, end)
-        return parkingMinutes * 0.03 + 1
+        val rawAmount = parkingMinutes * 0.03 + 1
+        // Redondear al decimal más cercano
+        return ceil(rawAmount * 10) / 10
     }
 
 }
