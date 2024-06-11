@@ -6,36 +6,40 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
+    android:background="#ADD8E6"
     tools:context=".activity.TokenActivity">
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
+        android:fontFamily="casual"
         android:text="@string/main_title"
         android:textAlignment="center"
-        android:textSize="24sp" />
+        android:textColor="@color/main_text_color"
+        android:textSize="42sp"
+        android:textStyle="bold" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/enter_button"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:layout_marginBottom="10sp"
-        android:backgroundTint="#3C883F"
+        android:layout_height="331dp"
+        android:background="@drawable/button_selector"
+        android:fontFamily="casual"
         android:text="@string/enter"
-        android:textSize="34sp" />
+        android:textColor="@color/main_text_color"
+        android:textSize="34sp"
+        android:textStyle="bold" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/exit_button"
         android:layout_width="match_parent"
-        android:layout_height="348dp"
+        android:layout_height="331dp"
+        android:background="@drawable/button_selector"
+        android:fontFamily="casual"
         android:text="@string/exit"
-        android:textSize="34sp" />
-
-    <include
-        android:id="@+id/include"
-        layout="@layout/content_nfc_action"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:textColor="@color/main_text_color"
+        android:textSize="34sp"
+        android:textStyle="bold" />
 
 </LinearLayout>

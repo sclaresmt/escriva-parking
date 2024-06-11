@@ -22,4 +22,7 @@ interface VehicleRecordDao {
     @Query("SELECT * FROM VehicleRecord WHERE dayId = :dayId")
     fun findByDay(dayId: Long): List<VehicleRecord>
 
+    @Query("SELECT * FROM VehicleRecord WHERE tokenId = :tokenId AND active = 1 LIMIT 1")
+    fun findActiveByTokenId(tokenId: Long): VehicleRecord?
+
 }

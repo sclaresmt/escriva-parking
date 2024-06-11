@@ -42,6 +42,10 @@ class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRe
         }
     }
 
+    fun findActiveVehicleRecordByTokenId(tokenId: Long): VehicleRecord? {
+        return vehicleRecordDao.findActiveByTokenId(tokenId)
+    }
+
     fun getVehicleRecordsForDay(dayId: Long): List<VehicleRecord> {
         return vehicleRecordDao.findByDay(dayId)
     }

@@ -26,8 +26,8 @@ class VehicleRecordAdapter(private val vehicleRecords: List<VehicleRecord>) :
     override fun onBindViewHolder(holder: VehicleRecordViewHolder, position: Int) {
         val vehicleRecord = vehicleRecords[position]
         holder.enterTimeTextView.text = vehicleRecord.enterTime.toString()
-        holder.exitTimeTextView.text = vehicleRecord.exitTime?.toString() ?: "N/A"
-        holder.amountTextView.text = vehicleRecord.amount.toString()
+        holder.exitTimeTextView.text = vehicleRecord.exitTime?.toString() ?: ""
+        holder.amountTextView.text = if (vehicleRecord.amount == 0.0) "" else vehicleRecord.amount.toString()
     }
 
     override fun getItemCount() = vehicleRecords.size
