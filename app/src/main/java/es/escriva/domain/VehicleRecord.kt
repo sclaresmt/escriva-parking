@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Entity(foreignKeys = [ForeignKey(entity = Token::class, parentColumns = ["id"], childColumns = ["tokenId"]),
     ForeignKey(entity = Day::class, parentColumns = ["id"], childColumns = ["dayId"])])
@@ -13,9 +14,9 @@ data class VehicleRecord(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
 
-    val enterTime: LocalDateTime,
+    val enterTime: LocalTime,
 
-    var exitTime: LocalDateTime? = null,
+    var exitTime: LocalTime? = null,
 
     var amount: Double = 0.0,
 

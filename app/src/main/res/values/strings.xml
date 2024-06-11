@@ -47,4 +47,8 @@
     <string name="exit">Salida</string>
     <string name="show_vehicle_records">Show Vehicle Records</string>
     <string name="total_amount">Total día:</string>
+    <string name="enter_time">Enter Time</string>
+    <string name="exit_time">Exit Time</string>
+    <string name="amount">Amount</string>
+    <string name="day_total_amount">"Total Día"</string>
 </resources>

@@ -9,7 +9,7 @@ class TokenRepository(private val tokenDao: TokenDao) {
         return tokenDao.upsert(token)
     }
 
-    fun findById(tokenId: Long): Token {
+    fun findById(tokenId: Long): Token? {
         return tokenDao.findById(tokenId)
     }
 

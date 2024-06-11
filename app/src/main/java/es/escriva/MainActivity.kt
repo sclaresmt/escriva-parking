@@ -25,6 +25,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 
 class MainActivity : AppCompatActivity() {
@@ -79,7 +80,8 @@ class MainActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             AppDatabase.getDatabase(this@MainActivity).also {
                 tokenRepository = TokenRepository(it.tokenDao())
-                dayAndVehiclesRepository = DayAndVehiclesRepository(it.dayDao(), it.vehicleRecordDao())
+                dayAndVehiclesRepository =
+                    DayAndVehiclesRepository(it.dayDao(), it.vehicleRecordDao())
             }
         }
 
@@ -91,12 +93,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        nfcAdapter?.enableForegroundDispatch(this, nfcPendingIntent, arrayOf(nfcIntentFilter, nfcTagDiscoverIntentFilter), null)
+        nfcAdapter.enableForegroundDispatch(
+            this,
+            nfcPendingIntent,
+            arrayOf(nfcIntentFilter, nfcTagDiscoverIntentFilter),
+            null
+        )
     }
 
     override fun onPause() {
         super.onPause()
-        nfcAdapter?.disableForegroundDispatch(this)
+        nfcAdapter.disableForegroundDispatch(this)
         progressDialog?.dismiss()
     }
 
@@ -108,14 +115,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        progressDialog?.show()
         if (NfcAdapter.ACTION_TAG_DISCOVERED == intent.action) {
-            // Formatear el tag con mensaje NDEF vacío
-            val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
-            val ndef = Ndef.get(tag)
-            val newMessage = NdefMessage(arrayOf(NdefRecord.createMime("text/plain", "".toByteArray())))
-            ndef.connect()
-            ndef.writeNdefMessage(newMessage)
-            ndef.close()
+            createNewTokenAndSetIdOnTag(intent)
             readTokenAndOpenTokenActions(intent)
         } else if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
             readTokenAndOpenTokenActions(intent)
@@ -126,48 +128,46 @@ class MainActivity : AppCompatActivity() {
         val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
         val ndef = Ndef.get(tag)
         val activityContext = this
-        progressDialog?.show()
 
         // Lanzar una nueva coroutine en el hilo de fondo
         nfcScope.launch(Dispatchers.IO) {
             val ndefMessage = ndef.cachedNdefMessage
             val record = ndefMessage.records[0]
             val payload = String(record.payload)
-            val tokenId = obtainTokenIdAndMakeTokenReadOnly(payload, ndef)
-
-            val token = tokenRepository.findById(tokenId)
+            tokenRepository.upsert(Token(id = payload.toLong(), lastUpdatedDateTime = LocalDateTime.now()))
+            val token = tokenRepository.findById(payload.toLong())
             val nfcIntent = Intent(activityContext, TokenActivity::class.java)
                 .putExtra("token", token)
             startActivity(nfcIntent)
         }
     }
 
-    private fun obtainTokenIdAndMakeTokenReadOnly(
-        payload: String,
-        ndef: Ndef
-    ): Long {
-        if (payload.isEmpty()) {
-            val newToken = Token(lastUpdatedDateTime = LocalDateTime.now())
-            val tokenId = tokenRepository.upsert(newToken)
-
-            val newRecord =
-                NdefRecord.createMime("text/plain", tokenId.toString().toByteArray())
-            val newMessage = NdefMessage(arrayOf(newRecord))
-            ndef.connect()
-            ndef.writeNdefMessage(newMessage)
-            ndef.makeReadOnly()
-            ndef.close()
-            return tokenId
-        }
-        return payload.toLong()
+    private fun createNewTokenAndSetIdOnTag(intent: Intent) {
+        val newToken = Token(lastUpdatedDateTime = LocalDateTime.now())
+        val tokenId = tokenRepository.upsert(newToken)
+        val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
+        val ndef = Ndef.get(tag)
+        val newMessage =
+            NdefMessage(arrayOf(NdefRecord.createMime("text/plain", tokenId.toString().toByteArray())))
+        ndef.connect()
+        ndef.writeNdefMessage(newMessage)
+        ndef.makeReadOnly()
+        ndef.close()
     }
 
-    fun showVehicleRecordsForActiveDay() {
-        val activeDay = dayAndVehiclesRepository.getActiveDay()
-        val intent = Intent(this, VehicleRecordActivity::class.java).apply {
-            putExtra("day", activeDay)
+    private fun showVehicleRecordsForActiveDay() {
+        CoroutineScope(Dispatchers.IO).launch {
+            var activeDay = dayAndVehiclesRepository.getActiveDay()
+            if (activeDay == null) {
+                activeDay = dayAndVehiclesRepository.newActiveDay()
+            }
+            withContext(Dispatchers.Main) {
+                val intent = Intent(this@MainActivity, VehicleRecordActivity::class.java).apply {
+                    putExtra("day", activeDay)
+                }
+                startActivity(intent)
+            }
         }
-        startActivity(intent)
     }
 
 }

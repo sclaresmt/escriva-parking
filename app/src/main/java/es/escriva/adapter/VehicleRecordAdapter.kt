@@ -12,8 +12,9 @@ class VehicleRecordAdapter(private val vehicleRecords: List<VehicleRecord>) :
     RecyclerView.Adapter<VehicleRecordAdapter.VehicleRecordViewHolder>() {
 
     class VehicleRecordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        // Aquí puedes vincular tus vistas, por ejemplo:
-         val vehicleNameTextView: TextView = itemView.findViewById(R.id.vehicle_name_text_view)
+        val enterTimeTextView: TextView = itemView.findViewById(R.id.enterTimeTextView)
+        val exitTimeTextView: TextView = itemView.findViewById(R.id.exitTimeTextView)
+        val amountTextView: TextView = itemView.findViewById(R.id.amountTextView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VehicleRecordViewHolder {
@@ -24,8 +25,9 @@ class VehicleRecordAdapter(private val vehicleRecords: List<VehicleRecord>) :
 
     override fun onBindViewHolder(holder: VehicleRecordViewHolder, position: Int) {
         val vehicleRecord = vehicleRecords[position]
-        // Aquí puedes asignar los valores de vehicleRecord a tus vistas, por ejemplo:
-         holder.vehicleNameTextView.text = vehicleRecord.name
+        holder.enterTimeTextView.text = vehicleRecord.enterTime.toString()
+        holder.exitTimeTextView.text = vehicleRecord.exitTime?.toString() ?: "N/A"
+        holder.amountTextView.text = vehicleRecord.amount.toString()
     }
 
     override fun getItemCount() = vehicleRecords.size

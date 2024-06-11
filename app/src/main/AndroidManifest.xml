@@ -15,6 +15,10 @@
         android:theme="@style/Theme.Parking"
         tools:targetApi="31">
         <activity
+            android:name=".activity.VehicleRecordActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Parking" />
+        <activity
             android:name=".activity.TokenActivity"
             android:exported="false"
             android:theme="@style/Theme.Parking" />

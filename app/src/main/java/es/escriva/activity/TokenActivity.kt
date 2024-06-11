@@ -2,6 +2,7 @@ package es.escriva.activity
 
 import android.os.Bundle
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -16,6 +17,7 @@ import es.escriva.repository.DayAndVehiclesRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TokenActivity : AppCompatActivity() {
 
@@ -34,7 +36,8 @@ class TokenActivity : AppCompatActivity() {
         // Initialize the database in a coroutine
         CoroutineScope(Dispatchers.IO).launch {
             AppDatabase.getDatabase(this@TokenActivity).also {
-                dayAndVehiclesRepository = DayAndVehiclesRepository(it.dayDao(), it.vehicleRecordDao())
+                dayAndVehiclesRepository =
+                    DayAndVehiclesRepository(it.dayDao(), it.vehicleRecordDao())
             }
         }
 
@@ -57,17 +60,14 @@ class TokenActivity : AppCompatActivity() {
         val enterButton = findViewById<Button>(R.id.enter_button)
         // Agrega un OnClickListener al botón con una coroutine
         enterButton.setOnClickListener {
-            lifecycleScope.launch {
-                enterAction(token)
-            }
+            enterAction(token)
         }
 
         val exitButton = findViewById<Button>(R.id.exit_button)
         exitButton.setOnClickListener {
-            lifecycleScope.launch {
-                exitAction(token)
-            }
+            exitAction(token)
         }
+
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -77,11 +77,23 @@ class TokenActivity : AppCompatActivity() {
     }
 
     private fun enterAction(token: Token) {
-        this.dayAndVehiclesRepository.enterAction(token)
+        lifecycleScope.launch(Dispatchers.IO) {
+            dayAndVehiclesRepository.enterAction(token)
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@TokenActivity, "Entrada registrada correctamente", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
     }
 
     private fun exitAction(token: Token) {
-        this.dayAndVehiclesRepository.exitAction(token)
+        lifecycleScope.launch(Dispatchers.IO) {
+            dayAndVehiclesRepository.exitAction(token)
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@TokenActivity, "Salida registrada correctamente", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
     }
 
 }

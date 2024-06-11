@@ -8,6 +8,7 @@ import es.escriva.domain.Token
 import es.escriva.domain.VehicleRecord
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 
 class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRecordDao: VehicleRecordDao) {
@@ -19,7 +20,7 @@ class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRe
             day = Day(date = LocalDate.now())
             dayDao.insert(day)
         }
-        val vehicleRecord = VehicleRecord(enterTime = LocalDateTime.now(), tokenId = token.id, dayId = day.id)
+        val vehicleRecord = VehicleRecord(enterTime = LocalTime.now(), tokenId = token.id, dayId = day.id)
         vehicleRecordDao.insert(vehicleRecord)
     }
 
@@ -27,22 +28,34 @@ class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRe
     fun exitAction(token: Token) {
         val vehicleRecord =
             vehicleRecordDao.findFirstActiveVehicleRecordByTokenId(token.id)
-        val exitTime = LocalDateTime.now()
-        vehicleRecord.exitTime = LocalDateTime.now()
+        val exitTime = LocalTime.now()
+        vehicleRecord.exitTime = LocalTime.now()
         vehicleRecord.active = false
         vehicleRecord.amount = calculateAmount(vehicleRecord.enterTime, exitTime)
         vehicleRecordDao.update(vehicleRecord)
+
+        var day = dayDao.findById(vehicleRecord.dayId)
+        if (day != null) {
+            day.dayAmount += vehicleRecord.amount
+            dayDao.update(day)
+        }
     }
 
     fun getVehicleRecordsForDay(dayId: Long): List<VehicleRecord> {
         return vehicleRecordDao.findByDay(dayId)
     }
 
+    fun newActiveDay(): Day {
+        val day = Day(date = LocalDate.now())
+        dayDao.insert(day)
+        return day
+    }
+
     fun getActiveDay(): Day? {
         return dayDao.findFirstActiveDay()
     }
 
-    private fun calculateAmount(start: LocalDateTime, end: LocalDateTime): Double {
+    private fun calculateAmount(start: LocalTime, end: LocalTime): Double {
         val parkingMinutes = ChronoUnit.MINUTES.between(start, end)
         return parkingMinutes * 0.03 + 1
     }
