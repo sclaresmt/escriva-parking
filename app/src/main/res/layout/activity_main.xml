@@ -8,16 +8,11 @@
     android:background="#FEFEFE"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btn_show_records"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/show_vehicle_records" />
-
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="408dp"
         android:layout_height="360dp"
+        android:contentDescription="@string/diver_city_logo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -15,7 +15,7 @@ import kotlin.math.ceil
 class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRecordDao: VehicleRecordDao) {
 
     @Transaction
-    fun enterAction(token: Token) {
+    suspend fun enterAction(token: Token) {
         var day = dayDao.findFirstActiveDay()
         if (day == null) {
             day = Day(date = LocalDate.now())
@@ -26,7 +26,7 @@ class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRe
     }
 
     @Transaction
-    fun exitAction(token: Token) {
+    suspend fun exitAction(token: Token) {
         val vehicleRecord =
             vehicleRecordDao.findFirstActiveVehicleRecordByTokenId(token.id)
         val exitTime = LocalTime.now()
@@ -42,21 +42,21 @@ class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRe
         }
     }
 
-    fun findActiveVehicleRecordByTokenId(tokenId: Long): VehicleRecord? {
+    suspend fun findActiveVehicleRecordByTokenId(tokenId: Long): VehicleRecord? {
         return vehicleRecordDao.findActiveByTokenId(tokenId)
     }
 
-    fun getVehicleRecordsForDay(dayId: Long): List<VehicleRecord> {
+    suspend fun getVehicleRecordsForDay(dayId: Long): List<VehicleRecord> {
         return vehicleRecordDao.findByDay(dayId)
     }
 
-    fun newActiveDay(): Day {
+    suspend fun newActiveDay(): Day {
         val day = Day(date = LocalDate.now())
         dayDao.insert(day)
         return day
     }
 
-    fun getActiveDay(): Day? {
+    suspend fun getActiveDay(): Day? {
         return dayDao.findFirstActiveDay()
     }
 
@@ -65,6 +65,17 @@ class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRe
         val rawAmount = parkingMinutes * 0.03 + 1
         // Redondear al decimal más cercano
         return ceil(rawAmount * 10) / 10
+    }
+
+    suspend fun closeDay(day: Day) {
+        day.active = false
+        dayDao.update(day)
+        vehicleRecordDao.findByDay(day.id).forEach {
+            if (!it.active) {
+                it.active = false
+                vehicleRecordDao.update(it)
+            }
+        }
     }
 
 }

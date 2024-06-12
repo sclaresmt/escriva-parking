@@ -11,15 +11,15 @@ import es.escriva.domain.Day
 interface DayDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(day: Day): Long
+    suspend fun insert(day: Day): Long
 
     @Query("SELECT * FROM Day WHERE active = 1 ORDER BY date ASC LIMIT 1")
-    fun findFirstActiveDay(): Day?
+    suspend fun findFirstActiveDay(): Day?
 
     @Query("SELECT * FROM Day WHERE id = :dayId")
-    fun findById(dayId: Long): Day?
+    suspend fun findById(dayId: Long): Day?
 
     @Update
-    fun update(day: Day)
+    suspend fun update(day: Day)
 
 }

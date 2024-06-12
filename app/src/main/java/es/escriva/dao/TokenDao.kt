@@ -9,9 +9,9 @@ import es.escriva.domain.Token
 interface TokenDao {
 
     @Query("SELECT * FROM Token WHERE id = :tokenId")
-    fun findById(tokenId: Long): Token?
+    suspend fun findById(tokenId: Long): Token?
 
     @Upsert
-    fun upsert(token: Token): Long
+    suspend fun upsert(token: Token): Long
 
 }

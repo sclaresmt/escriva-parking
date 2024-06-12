@@ -15,6 +15,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import es.escriva.activity.AdminActivity
 import es.escriva.activity.TokenActivity
 import es.escriva.activity.VehicleRecordActivity
 import es.escriva.database.AppDatabase
@@ -85,10 +86,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val showRecordsButton: Button = findViewById(R.id.btn_show_records)
-        showRecordsButton.setOnClickListener {
-            showVehicleRecordsForActiveDay()
-        }
     }
 
     override fun onResume() {
@@ -134,11 +131,16 @@ class MainActivity : AppCompatActivity() {
             val ndefMessage = ndef.cachedNdefMessage
             val record = ndefMessage.records[0]
             val payload = String(record.payload)
-            tokenRepository.upsert(Token(id = payload.toLong(), lastUpdatedDateTime = LocalDateTime.now()))
-            val token = tokenRepository.findById(payload.toLong())
-            val nfcIntent = Intent(activityContext, TokenActivity::class.java)
-                .putExtra("token", token)
-            startActivity(nfcIntent)
+            if (payload.contains("enAdmin", false)) {
+                val nfcIntent = Intent(activityContext, AdminActivity::class.java)
+                startActivity(nfcIntent)
+            } else {
+                tokenRepository.upsert(Token(id = payload.toLong(), lastUpdatedDateTime = LocalDateTime.now()))
+                val token = tokenRepository.findById(payload.toLong())
+                val nfcIntent = Intent(activityContext, TokenActivity::class.java)
+                    .putExtra("token", token)
+                startActivity(nfcIntent)
+            }
         }
     }
 
@@ -154,21 +156,6 @@ class MainActivity : AppCompatActivity() {
             ndef.writeNdefMessage(newMessage)
             ndef.makeReadOnly()
             ndef.close()
-        }
-    }
-
-    private fun showVehicleRecordsForActiveDay() {
-        CoroutineScope(Dispatchers.IO).launch {
-            var activeDay = dayAndVehiclesRepository.getActiveDay()
-            if (activeDay == null) {
-                activeDay = dayAndVehiclesRepository.newActiveDay()
-            }
-            withContext(Dispatchers.Main) {
-                val intent = Intent(this@MainActivity, VehicleRecordActivity::class.java).apply {
-                    putExtra("day", activeDay)
-                }
-                startActivity(intent)
-            }
         }
     }
 

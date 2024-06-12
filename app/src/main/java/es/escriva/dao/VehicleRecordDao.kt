@@ -11,18 +11,18 @@ import es.escriva.domain.VehicleRecord
 interface VehicleRecordDao {
 
     @Query("SELECT * FROM VehicleRecord WHERE tokenId = :tokenId AND active == 1 LIMIT 1")
-    fun findFirstActiveVehicleRecordByTokenId(tokenId: Long): VehicleRecord
+    suspend fun findFirstActiveVehicleRecordByTokenId(tokenId: Long): VehicleRecord
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(vehicleRecord: VehicleRecord): Long
+    suspend fun insert(vehicleRecord: VehicleRecord): Long
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun update(vehicleRecord: VehicleRecord): Int
+    suspend fun update(vehicleRecord: VehicleRecord): Int
 
     @Query("SELECT * FROM VehicleRecord WHERE dayId = :dayId")
-    fun findByDay(dayId: Long): List<VehicleRecord>
+    suspend fun findByDay(dayId: Long): List<VehicleRecord>
 
     @Query("SELECT * FROM VehicleRecord WHERE tokenId = :tokenId AND active = 1 LIMIT 1")
-    fun findActiveByTokenId(tokenId: Long): VehicleRecord?
+    suspend fun findActiveByTokenId(tokenId: Long): VehicleRecord?
 
 }

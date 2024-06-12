@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import java.time.LocalDateTime
 import java.time.LocalTime
 
 @Entity(foreignKeys = [ForeignKey(entity = Token::class, parentColumns = ["id"], childColumns = ["tokenId"]),

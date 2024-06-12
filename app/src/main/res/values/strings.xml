@@ -13,4 +13,5 @@
     <string name="amount">Amount</string>
     <string name="day_total_amount">"Total Día"</string>
     <string name="main_tooltip">Usa una etiqueta NFC para comenzar</string>
+    <string name="diver_city_logo">Diver City Logo</string>
 </resources>
