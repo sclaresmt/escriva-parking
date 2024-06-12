@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    android:background="#ADD8E6"
+    android:background="@color/main_background_color"
     tools:context=".activity.TokenActivity">
 
     <TextView

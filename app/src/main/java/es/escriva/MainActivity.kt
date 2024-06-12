@@ -143,16 +143,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createNewTokenAndSetIdOnTag(intent: Intent) {
-        val newToken = Token(lastUpdatedDateTime = LocalDateTime.now())
-        val tokenId = tokenRepository.upsert(newToken)
-        val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
-        val ndef = Ndef.get(tag)
-        val newMessage =
-            NdefMessage(arrayOf(NdefRecord.createMime("text/plain", tokenId.toString().toByteArray())))
-        ndef.connect()
-        ndef.writeNdefMessage(newMessage)
-        ndef.makeReadOnly()
-        ndef.close()
+        nfcScope.launch(Dispatchers.IO) {
+            val newToken = Token(lastUpdatedDateTime = LocalDateTime.now())
+            val tokenId = tokenRepository.upsert(newToken)
+            val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
+            val ndef = Ndef.get(tag)
+            val newMessage =
+                NdefMessage(arrayOf(NdefRecord.createMime("text/plain", tokenId.toString().toByteArray())))
+            ndef.connect()
+            ndef.writeNdefMessage(newMessage)
+            ndef.makeReadOnly()
+            ndef.close()
+        }
     }
 
     private fun showVehicleRecordsForActiveDay() {
