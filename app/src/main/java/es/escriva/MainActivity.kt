@@ -10,14 +10,13 @@ import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.os.Bundle
-import android.widget.Button
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import es.escriva.activity.AdminActivity
 import es.escriva.activity.TokenActivity
-import es.escriva.activity.VehicleRecordActivity
 import es.escriva.database.AppDatabase
 import es.escriva.domain.Token
 import es.escriva.repository.DayAndVehiclesRepository
@@ -27,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.time.LocalDateTime
 
 class MainActivity : AppCompatActivity() {
@@ -113,49 +113,66 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         progressDialog?.show()
+        val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
+        val ndef = Ndef.get(tag)
         if (NfcAdapter.ACTION_TAG_DISCOVERED == intent.action) {
-            createNewTokenAndSetIdOnTag(intent)
-            readTokenAndOpenTokenActions(intent)
+            ndef?.connect()
+            nfcScope.launch {
+                launch(Dispatchers.IO) {
+                    createNewTokenAndSetIdOnTag(ndef)
+                }.join()
+                readTokenAndOpenTokenActions(ndef)
+            }
         } else if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
-            readTokenAndOpenTokenActions(intent)
+            ndef?.connect()
+            readTokenAndOpenTokenActions(ndef)
         }
     }
 
-    private fun readTokenAndOpenTokenActions(intent: Intent) {
-        val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
-        val ndef = Ndef.get(tag)
-        val activityContext = this
-
+    private fun readTokenAndOpenTokenActions(ndef: Ndef) {
         // Lanzar una nueva coroutine en el hilo de fondo
         nfcScope.launch(Dispatchers.IO) {
-            val ndefMessage = ndef.cachedNdefMessage
+            val ndefMessage = ndef.ndefMessage
+            if (ndefMessage == null) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MainActivity, "Error al leer la etiqueta NFC. " +
+                            "Intente de nuevo sin alejar la etiqueta.", Toast.LENGTH_LONG).show()
+                }
+            }
             val record = ndefMessage.records[0]
             val payload = String(record.payload)
             if (payload.contains("enAdmin", false)) {
-                val nfcIntent = Intent(activityContext, AdminActivity::class.java)
+                val nfcIntent = Intent(this@MainActivity, AdminActivity::class.java)
                 startActivity(nfcIntent)
             } else {
                 tokenRepository.upsert(Token(id = payload.toLong(), lastUpdatedDateTime = LocalDateTime.now()))
                 val token = tokenRepository.findById(payload.toLong())
-                val nfcIntent = Intent(activityContext, TokenActivity::class.java)
+                val nfcIntent = Intent(this@MainActivity, TokenActivity::class.java)
                     .putExtra("token", token)
                 startActivity(nfcIntent)
             }
         }
     }
 
-    private fun createNewTokenAndSetIdOnTag(intent: Intent) {
-        nfcScope.launch(Dispatchers.IO) {
-            val newToken = Token(lastUpdatedDateTime = LocalDateTime.now())
-            val tokenId = tokenRepository.upsert(newToken)
-            val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
-            val ndef = Ndef.get(tag)
-            val newMessage =
-                NdefMessage(arrayOf(NdefRecord.createMime("text/plain", tokenId.toString().toByteArray())))
-            ndef.connect()
+    private suspend fun createNewTokenAndSetIdOnTag(ndef: Ndef) {
+        val newToken = Token(lastUpdatedDateTime = LocalDateTime.now())
+        val tokenId = tokenRepository.upsert(newToken)
+        val newMessage =
+            NdefMessage(arrayOf(NdefRecord.createMime("text/plain", tokenId.toString().toByteArray())))
+        try {
+            if (!ndef.isConnected) {
+                throw IOException("La etiqueta NFC no está conectada.")
+            }
+            if (ndef.maxSize < newMessage.toByteArray().size) {
+                throw IOException("La etiqueta NFC no tiene suficiente espacio para el mensaje.")
+            }
             ndef.writeNdefMessage(newMessage)
             ndef.makeReadOnly()
-            ndef.close()
+        } catch (e: SecurityException) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@MainActivity, "Error al escribir en la etiqueta " +
+                        "NFC. Intente de nuevo sin alejar la etiqueta.", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
