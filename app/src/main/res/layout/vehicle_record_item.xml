@@ -3,13 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@drawable/border">
 
     <TextView
         android:id="@+id/enterTimeTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:fontFamily="casual"
+        android:textStyle="bold"
+        android:textColor="@color/main_text_color"
         android:text="@string/enter_time"/>
 
     <TextView
@@ -17,6 +21,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:fontFamily="casual"
+        android:textStyle="bold"
+        android:textColor="@color/main_text_color"
         android:text="@string/exit_time"/>
 
     <TextView
@@ -24,6 +31,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:textAlignment="viewEnd"
+        android:fontFamily="casual"
+        android:textStyle="bold"
+        android:textColor="@color/main_text_color"
         android:text="@string/amount"/>
 
 </LinearLayout>

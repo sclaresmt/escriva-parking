@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import es.escriva.domain.Day
+import java.time.LocalDate
 
 @Dao
 interface DayDao {
@@ -21,5 +22,8 @@ interface DayDao {
 
     @Update
     suspend fun update(day: Day)
+
+    @Query("SELECT * FROM Day WHERE date < :date ORDER BY date DESC LIMIT 1")
+    suspend fun findFirsPreviousRegisteredDay(date: LocalDate): Day?
 
 }

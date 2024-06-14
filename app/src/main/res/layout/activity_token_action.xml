@@ -13,9 +13,9 @@
         android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:fontFamily="casual"
         android:text="@string/main_title"
         android:textAlignment="center"
+        android:fontFamily="casual"
         android:textColor="@color/main_text_color"
         android:textSize="42sp"
         android:textStyle="bold" />

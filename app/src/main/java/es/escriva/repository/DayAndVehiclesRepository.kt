@@ -78,4 +78,8 @@ class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRe
         }
     }
 
+    suspend fun getPreviousRegisteredDay(day: Day): Day? {
+        return dayDao.findFirsPreviousRegisteredDay(day.date)
+    }
+
 }

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import es.escriva.R
 import es.escriva.domain.VehicleRecord
 
-class VehicleRecordAdapter(private val vehicleRecords: List<VehicleRecord>) :
+class VehicleRecordAdapter(var vehicleRecords: List<VehicleRecord>) :
     RecyclerView.Adapter<VehicleRecordAdapter.VehicleRecordViewHolder>() {
 
     class VehicleRecordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
