@@ -16,4 +16,5 @@
     <string name="diver_city_logo">Diver City Logo</string>
     <string name="currency">€</string>
     <string name="previous_day">Día anterior</string>
+    <string name="create_admin">Crear NFC para Admin</string>
 </resources>

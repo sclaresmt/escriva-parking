@@ -13,7 +13,7 @@
         android:layout_weight="1"
         android:fontFamily="casual"
         android:textStyle="bold"
-        android:textColor="@color/main_text_color"
+        android:textColor="@color/main_text"
         android:text="@string/enter_time"/>
 
     <TextView
@@ -23,7 +23,7 @@
         android:layout_weight="1"
         android:fontFamily="casual"
         android:textStyle="bold"
-        android:textColor="@color/main_text_color"
+        android:textColor="@color/main_text"
         android:text="@string/exit_time"/>
 
     <TextView
@@ -34,7 +34,7 @@
         android:textAlignment="viewEnd"
         android:fontFamily="casual"
         android:textStyle="bold"
-        android:textColor="@color/main_text_color"
+        android:textColor="@color/main_text"
         android:text="@string/amount"/>
 
 </LinearLayout>

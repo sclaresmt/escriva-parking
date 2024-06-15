@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="main_background_color">#FFFEFEFE</color>
-    <color name="main_text_color">#223A93</color>
-    <color name="enabled_button_color">#FF56CEF2</color>
+    <color name="main_background">#FFFEFEFE</color>
+    <color name="main_text">#223A93</color>
+    <color name="enabled_button">#FF56CEF2</color>
 </resources>
