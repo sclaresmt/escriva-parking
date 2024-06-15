@@ -7,7 +7,6 @@ import es.escriva.domain.Day
 import es.escriva.domain.Token
 import es.escriva.domain.VehicleRecord
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import kotlin.math.ceil
@@ -19,10 +18,13 @@ class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRe
         var day = dayDao.findFirstActiveDay()
         if (day == null) {
             day = Day(date = LocalDate.now())
-            dayDao.insert(day)
+            val dayId = dayDao.insert(day)
+            day = dayDao.findById(dayId)
         }
-        val vehicleRecord = VehicleRecord(enterTime = LocalTime.now(), tokenId = token.id, dayId = day.id)
+        val vehicleRecord = VehicleRecord(enterTime = LocalTime.now(), tokenId = token.id, dayId = day?.id!!)
         vehicleRecordDao.insert(vehicleRecord)
+        day.vehiclesCount++
+        dayDao.update(day)
     }
 
     @Transaction
@@ -40,6 +42,18 @@ class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRe
             day.dayAmount += vehicleRecord.amount
             dayDao.update(day)
         }
+    }
+
+    @Transaction
+    suspend fun closeDay(day: Day) {
+        vehicleRecordDao.findActiveByDay(day.id).forEach {
+            if (it.active) {
+                it.active = false
+                vehicleRecordDao.update(it)
+            }
+        }
+        day.active = false
+        dayDao.update(day)
     }
 
     suspend fun findActiveVehicleRecordByTokenId(tokenId: Long): VehicleRecord? {
@@ -65,17 +79,6 @@ class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRe
         val rawAmount = parkingMinutes * 0.03 + 1
         // Redondear al decimal más cercano
         return ceil(rawAmount * 10) / 10
-    }
-
-    suspend fun closeDay(day: Day) {
-        day.active = false
-        dayDao.update(day)
-        vehicleRecordDao.findByDay(day.id).forEach {
-            if (!it.active) {
-                it.active = false
-                vehicleRecordDao.update(it)
-            }
-        }
     }
 
     suspend fun getPreviousRegisteredDay(day: Day): Day? {

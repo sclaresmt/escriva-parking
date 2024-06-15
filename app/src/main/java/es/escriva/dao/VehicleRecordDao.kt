@@ -19,10 +19,13 @@ interface VehicleRecordDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(vehicleRecord: VehicleRecord): Int
 
-    @Query("SELECT * FROM VehicleRecord WHERE dayId = :dayId")
-    suspend fun findByDay(dayId: Long): List<VehicleRecord>
+    @Query("SELECT * FROM VehicleRecord WHERE dayId = :dayId AND active = 1")
+    suspend fun findActiveByDay(dayId: Long): List<VehicleRecord>
 
     @Query("SELECT * FROM VehicleRecord WHERE tokenId = :tokenId AND active = 1 LIMIT 1")
     suspend fun findActiveByTokenId(tokenId: Long): VehicleRecord?
+
+    @Query("SELECT * FROM VehicleRecord WHERE dayId = :dayId")
+    suspend fun findByDay(dayId: Long): List<VehicleRecord>
 
 }

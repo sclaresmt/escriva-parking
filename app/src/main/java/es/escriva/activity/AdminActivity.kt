@@ -3,6 +3,7 @@ package es.escriva.activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -67,7 +68,9 @@ class AdminActivity : AppCompatActivity() {
             builder.setPositiveButton("Aceptar") { dialog, which ->
                 CoroutineScope(Dispatchers.IO).launch {
                     dayAndVehiclesRepository.closeDay(activeDay)
-                    // TODO: Mostrar mensaje de éxito
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@AdminActivity, "Día cerrado correctamente", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
             builder.setNegativeButton("Cancelar") { dialog, which ->
