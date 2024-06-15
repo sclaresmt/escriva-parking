@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import java.math.BigDecimal
 import java.time.LocalTime
 
 @Entity(foreignKeys = [ForeignKey(entity = Token::class, parentColumns = ["id"], childColumns = ["tokenId"]),
@@ -17,7 +18,7 @@ data class VehicleRecord(
 
     var exitTime: LocalTime? = null,
 
-    var amount: Double = 0.0,
+    var amount: BigDecimal = BigDecimal.ZERO,
 
     var active: Boolean = true,
 

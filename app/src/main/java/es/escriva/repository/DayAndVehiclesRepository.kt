@@ -6,10 +6,11 @@ import es.escriva.dao.VehicleRecordDao
 import es.escriva.domain.Day
 import es.escriva.domain.Token
 import es.escriva.domain.VehicleRecord
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
-import kotlin.math.ceil
 
 class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRecordDao: VehicleRecordDao) {
 
@@ -74,15 +75,14 @@ class DayAndVehiclesRepository(private val dayDao: DayDao, private val vehicleRe
         return dayDao.findFirstActiveDay()
     }
 
-    private fun calculateAmount(start: LocalTime, end: LocalTime): Double {
-        val parkingMinutes = ChronoUnit.MINUTES.between(start, end)
-        val rawAmount = parkingMinutes * 0.03 + 1
-        // Redondear al decimal más cercano
-        return ceil(rawAmount * 10) / 10
-    }
-
     suspend fun getPreviousRegisteredDay(day: Day): Day? {
         return dayDao.findFirsPreviousRegisteredDay(day.date)
+    }
+
+    private fun calculateAmount(start: LocalTime, end: LocalTime): BigDecimal {
+        val parkingMinutes = BigDecimal(ChronoUnit.MINUTES.between(start, end))
+        val rawAmount = parkingMinutes.multiply(BigDecimal("0.03")).add(BigDecimal("1"))
+        return rawAmount.setScale(1, RoundingMode.HALF_UP)
     }
 
 }

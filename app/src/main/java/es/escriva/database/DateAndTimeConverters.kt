@@ -5,9 +5,8 @@ import es.escriva.config.Constants
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
-class Converters {
+class DateAndTimeConverters {
 
     @TypeConverter
     fun toLocalDateTime(value: String?): LocalDateTime? {

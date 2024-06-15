@@ -3,6 +3,7 @@ package es.escriva.domain
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.io.Serializable
+import java.math.BigDecimal
 import java.time.LocalDate
 
 @Entity
@@ -15,7 +16,7 @@ data class Day (
 
     var vehiclesCount: Int = 0,
 
-    var dayAmount: Double = 0.0,
+    var dayAmount: BigDecimal = BigDecimal.ZERO,
 
     var active: Boolean = true
 

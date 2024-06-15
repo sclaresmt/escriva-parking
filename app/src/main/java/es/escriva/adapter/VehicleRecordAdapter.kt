@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import es.escriva.R
 import es.escriva.domain.VehicleRecord
+import java.math.BigDecimal
 
 class VehicleRecordAdapter(var vehicleRecords: List<VehicleRecord>) :
     RecyclerView.Adapter<VehicleRecordAdapter.VehicleRecordViewHolder>() {
@@ -27,7 +28,7 @@ class VehicleRecordAdapter(var vehicleRecords: List<VehicleRecord>) :
         val vehicleRecord = vehicleRecords[position]
         holder.enterTimeTextView.text = vehicleRecord.enterTime.toString()
         holder.exitTimeTextView.text = vehicleRecord.exitTime?.toString() ?: ""
-        holder.amountTextView.text = if (vehicleRecord.amount == 0.0) "" else vehicleRecord.amount.toString()
+        holder.amountTextView.text = if (vehicleRecord.amount == BigDecimal.ZERO) "" else vehicleRecord.amount.toString()
     }
 
     override fun getItemCount() = vehicleRecords.size

@@ -13,7 +13,7 @@ import es.escriva.domain.Token
 import es.escriva.domain.VehicleRecord
 
 @Database(entities = [Token::class, Day::class, VehicleRecord::class], version = 1)
-@TypeConverters(Converters::class)
+@TypeConverters(DateAndTimeConverters::class, BigDecimalConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun tokenDao(): TokenDao
 
