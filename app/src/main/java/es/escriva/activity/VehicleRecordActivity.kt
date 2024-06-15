@@ -18,6 +18,7 @@ import es.escriva.repository.DayAndVehiclesRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.abs
 
 class VehicleRecordActivity : AppCompatActivity() {
@@ -58,8 +59,10 @@ class VehicleRecordActivity : AppCompatActivity() {
 
         // Actualizar los datos
         val adapter = vehicleRecordRecyclerView.adapter as? VehicleRecordAdapter
-        adapter?.vehicleRecords ?: newVehicleRecords
-        adapter?.notifyDataSetChanged()
+        if (adapter != null) {
+            adapter.vehicleRecords = newVehicleRecords
+            adapter.notifyDataSetChanged()
+        }
 
         // Actualizar los TextView
         val totalAmount = newDay.dayAmount
@@ -71,13 +74,15 @@ class VehicleRecordActivity : AppCompatActivity() {
         dayDateTextView.text = String.format("%s: ", dayDate.format(Constants().dateFormatter))
     }
 
-    fun loadPreviousDayData() {
+    private fun loadPreviousDayData() {
         CoroutineScope(Dispatchers.IO).launch {
             val previousRegisteredDay = dayAndVehiclesRepository.getPreviousRegisteredDay(day)
             if (previousRegisteredDay != null) {
                 day = previousRegisteredDay
                 val vehicleRecords = dayAndVehiclesRepository.getVehicleRecordsForDay(previousRegisteredDay.id)
-                updateDataAndRefreshView(vehicleRecords, previousRegisteredDay)
+                withContext(Dispatchers.Main) {
+                    updateDataAndRefreshView(vehicleRecords, previousRegisteredDay)
+                }
             }
         }
     }
