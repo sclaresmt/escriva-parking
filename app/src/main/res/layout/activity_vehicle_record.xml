@@ -88,7 +88,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/previous_day_button"
-        android:layout_width="412dp"
+        android:layout_width="0dp"
         android:layout_height="91dp"
         android:layout_marginTop="1dp"
         android:background="@drawable/button_selector"
