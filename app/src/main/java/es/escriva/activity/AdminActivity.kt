@@ -1,28 +1,32 @@
 package es.escriva.activity
 
 import android.content.Intent
+import android.nfc.NdefMessage
+import android.nfc.NdefRecord
+import android.nfc.tech.Ndef
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import es.escriva.R
 import es.escriva.database.AppDatabase
 import es.escriva.repository.DayAndVehiclesRepository
-import es.escriva.repository.TokenRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.time.LocalDate
 
-class AdminActivity : AppCompatActivity() {
+class AdminActivity : BaseNfcActivity() {
 
     private lateinit var dayAndVehiclesRepository: DayAndVehiclesRepository
+
+    private var adminDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,10 +50,47 @@ class AdminActivity : AppCompatActivity() {
             showVehicleRecordsForActiveDay()
         }
 
+        val createAdminButton: Button = findViewById(R.id.btn_create_admin)
+        createAdminButton.setOnClickListener {
+            showDialogAndWaitForToken()
+        }
+
         // Aquí es donde verificas tu condición
         lifecycleScope.launch {
             showAlertForOldActiveDay()
         }
+    }
+
+    override fun onNewNfcTagDiscovered(ndef: Ndef) {
+        if (adminDialog?.isShowing == true) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val newMessage =
+                        NdefMessage(arrayOf(NdefRecord.createMime("text/plain", "Admin".toByteArray())))
+                    ndef.writeNdefMessage(newMessage)
+                    ndef.makeReadOnly()
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@AdminActivity, "Token registrado correctamente", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: IOException) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@AdminActivity, "Error al registrar el token", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            adminDialog!!.dismiss()
+        } else {
+            super.onNewNfcTagDiscovered(ndef)
+        }
+    }
+
+    private fun showDialogAndWaitForToken() {
+        adminDialog = AlertDialog.Builder(this@AdminActivity)
+            .setTitle("Esperando token sin formato...")
+            .setMessage("Por favor, acerque el token sin formato al dispositivo.")
+            .setCancelable(true)
+            .create()
+        adminDialog!!.show()
     }
 
     private suspend fun showAlertForOldActiveDay() {

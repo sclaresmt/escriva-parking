@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
 
-class VehicleRecordActivity : AppCompatActivity() {
+class VehicleRecordActivity : BaseNfcActivity() {
 
     private lateinit var vehicleRecordRecyclerView: RecyclerView
 
