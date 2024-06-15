@@ -73,15 +73,22 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/activity_vehicle_records"
-        android:layout_width="407dp"
-        android:layout_height="583dp"
-        app:layout_constraintBottom_toTopOf="@+id/previous_day_button"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="64dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.0" >
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="android:id=&quot;@+id/activity_vehicle_records&quot;&#xA;        android:layout_width=&quot;0dp&quot;&#xA;        android:layout_height=&quot;0dp&quot;&#xA;        android:layout_marginTop=&quot;64dp&quot;&#xA;        app:layout_constraintBottom_toBottomOf=&quot;parent&quot;&#xA;        app:layout_constraintHorizontal_bias=&quot;1.0&quot;&#xA;        app:layout_constraintLeft_toLeftOf=&quot;parent&quot;&#xA;        app:layout_constraintRight_toRightOf=&quot;parent&quot;&#xA;        app:layout_constraintTop_toTopOf=&quot;parent&quot;&#xA;        app:layout_constraintVertical_bias=&quot;0.0&quot;" />
+    </androidx.recyclerview.widget.RecyclerView>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/previous_day_button"

@@ -42,6 +42,7 @@ class VehicleRecordActivity : AppCompatActivity() {
                 dayAndVehiclesRepository =
                     DayAndVehiclesRepository(it.dayDao(), it.vehicleRecordDao())
                 val vehicleRecords = dayAndVehiclesRepository.getVehicleRecordsForDay(day.id)
+                vehicleRecordRecyclerView.adapter = VehicleRecordAdapter(vehicleRecords)
                 updateDataAndRefreshView(vehicleRecords, day)
             }
         }
@@ -54,16 +55,11 @@ class VehicleRecordActivity : AppCompatActivity() {
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateDataAndRefreshView(newVehicleRecords: List<VehicleRecord>, newDay: Day) {
+
         // Actualizar los datos
         val adapter = vehicleRecordRecyclerView.adapter as? VehicleRecordAdapter
-        if (adapter != null) {
-            // Si ya existe un adaptador, actualiza sus datos
-            adapter.vehicleRecords = newVehicleRecords
-            adapter.notifyDataSetChanged()
-        } else {
-            // Si no existe un adaptador, crea uno nuevo
-            vehicleRecordRecyclerView.adapter = VehicleRecordAdapter(newVehicleRecords)
-        }
+        adapter?.vehicleRecords ?: newVehicleRecords
+        adapter?.notifyDataSetChanged()
 
         // Actualizar los TextView
         val totalAmount = newDay.dayAmount
